@@ -2,15 +2,6 @@ import argparse
 import json
 import os
 
-
-headers ={'user-agent':'Mozilla/5.0 (Windows NT x.y; rv:10.0) Gecko/20100101 Firefox/10.0'}
-baseAddress = "https://www.resultats-elections.interieur.gouv.fr/presidentielle-2022/"
-xpathNamespace={"re": "http://exslt.org/regular-expressions"}
-
-
-"""
-parcourt l'ensemble des pages disponibles en récupérant les scrutins par zone
-"""
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
