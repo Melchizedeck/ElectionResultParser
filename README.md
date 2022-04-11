@@ -9,6 +9,15 @@ download elections data and check ratios in order to fight (my own) comspiration
 ## Uglyness
 that code is made as fast as I can, in order to learn html parsing.
 
+## Usage
+
+```bash
+python parse.py --json results_full.json --jsonIndent 4 --logLevel INFO
+```
+
+```bash
+python json_postprocess.py --input results_full.json --output result_small.json
+```
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
