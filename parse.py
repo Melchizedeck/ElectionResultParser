@@ -10,7 +10,6 @@ import os
 
 log = logging.getLogger("main")
 headers ={'user-agent':'Mozilla/5.0 (Windows NT x.y; rv:10.0) Gecko/20100101 Firefox/10.0'}
-baseAddress = "https://www.resultats-elections.interieur.gouv.fr/presidentielle-2022/"
 xpathNamespace={"re": "http://exslt.org/regular-expressions"}
 
 """
@@ -115,7 +114,7 @@ if __name__ == '__main__':
                 departmentNode = {'level':2, 'name':departmentName, 'url':departmentURL, 'children':[], 'result':ParseResultats(departmentURL)}
                 regionNode['children'].append(departmentNode)
                 for departmentIndexName, departmentIndexURL in browse(session, departmentURL, "//a[re:match(@href,'\.\./\.\./[0-9]+/[0-9A-Z]+/[0-9A-Z]+\.html$')]"):
-                    for townName, townURL in browse(session, departmentIndexURL, "//a[re:match(@href,'\.\./\.\./[0-9]+/[0-9A-Z]+/[0-9]+[A-Z]?[0-9]+\.html$')]"):
+                    for townName, townURL in browse(session, departmentIndexURL, "//a[re:match(@href,'\.\./\.\./[0-9]+/[0-9A-Z]+/[0-9]+[A-Z]?R?[0-9]+\.html$')]"):
                         log.info("parsing '\t\t{}'".format(townName))
                         townNode={'level':3, 'name':townName, 'url':townURL, 'result':ParseResultats(townURL) }
                         departmentNode['children'].append(townNode)
