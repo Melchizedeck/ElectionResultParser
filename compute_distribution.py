@@ -1,60 +1,58 @@
 import argparse
 import json
 import os
-import matplotlib.pyplot as plt
-import seaborn as sns
-import pandas as pd
+import matplotlib.pyplot
+import seaborn
+import pandas
 
-def groupResults(areas, fieldName):
-    data = {}
-    candidatResults = [candidat for area in areas for candidat in area['result']['candidats']]
-    for candidat in candidatResults:
-        if not candidat['name'] in data:
-            data[candidat['name']]=[candidat[fieldName]]
-        else:
-            data[candidat['name']].append(candidat[fieldName])
-    return data
-
-
-def display(title, data):
-    frames=[]
-    for candidat in data.items():
-        name = candidat[0].split(' ')[2]
-        frames.append(pd.DataFrame({ 'candidat' : name, 'scrutin': candidat[1] }))
-    df=frames[0]
-    for f in frames[1:]:
-        df = df.append(f)
-    # Usual boxplot
-    sns.boxplot(x='candidat', y='scrutin', data=df)
-    
-    plt.title(title, loc="left")
-    plt.show()
-    
-    
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-
     parser.add_argument("--input", metavar='input', type=str, help="json input file", required=True)
-    parser.set_defaults(jsonIndent = None)
-    parser.set_defaults(logLevel = None)
+    parser.add_argument("--output", metavar='output', type=str, help="output file")
+
     args = parser.parse_args()
- 
-    field = 'inscritsPourcent' # 'exprimesPourcent' 'inscritsPourcent'
- 
+    field = 'exprimesPourcent' # 'exprimesPourcent' 'inscritsPourcent'
+
     with open(args.input,'r') as f: 
         node = json.load(f)
+        
         regions = node['children']
         departments = [department for region in regions for department in region['children']]
         towns = [town for department in departments for town in department['children']]
         
         areaLevels={
-            "Regions" : regions,
-            "Departments" : departments,
-            "Towns" : towns,
+            "régions" : regions,
+            "départements" : departments,
+            "villes" : towns,
         }
+        candidatName=[]
+        groupNames=[]
+        values=[]
+        for groupName, areas in areaLevels.items():
+            candidatResults = [candidat for area in areas for candidat in area['result']['candidats']]
+            for cr in candidatResults:
+                candidatName.append(' '.join(cr['name'].split(' ')[2:]))
+                values.append(cr[field])
+                groupNames.append(groupName)
+                
+
+
+        df=pandas.DataFrame({ 'candidat' : candidatName, 'scrutin': values, 'group':groupNames })
+
+        matplotlib.rcParams['figure.figsize']=[15,8]
+        matplotlib.rcParams['figure.dpi']=200
         
+        matplotlib.rcParams['figure.subplot.left']=0.045
+        matplotlib.rcParams['figure.subplot.right']=0.99
+        matplotlib.rcParams['figure.subplot.top']=0.98
+        matplotlib.rcParams['figure.subplot.bottom']=0.07
+        ax = seaborn.boxplot(x='candidat', y='scrutin', hue='group', width=0.5, data=df, showfliers = False)
+        ax.set_ylim(-1, 60)
         
-        for name, areas in areaLevels.items():
-            data = groupResults(areas, field)
-            display(name, data)
+        #matplotlib.pyplot.title(title, loc="left")
+        if args.output:
+            matplotlib.pyplot.savefig(args.output)
+        else:
+            matplotlib.pyplot.show()
+        matplotlib.pyplot.clf()
 
